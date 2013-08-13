@@ -23,7 +23,7 @@ window.Nifty.Dialog =
   open: (options={})->
 
     # set a dialog ID for this dialog
-    dialogsOpen = $('div.dialog').length
+    dialogsOpen = $('div.niftyDialog').length
     dialogID = if dialogsOpen == 0 then this.startingID else (dialogsOpen * 10) + this.startingID
     
     # create a template and assign the ID
@@ -73,7 +73,7 @@ window.Nifty.Dialog =
   # This method will replace the contents of the nearest dialog (or the one with the
   # given ID if one is given).
   setContent: (content, id = null)->
-    dialog = if id == null then $('div.dialog:last') else $("div.dialog.dialog-#{id}")
+    dialog = if id == null then $('div.niftyDialog:last') else $("div.niftyDialog#dialog-#{id}")
     dialog.html(content)
     this.onSetContent(null, dialog) if this.onSetContent?
   
