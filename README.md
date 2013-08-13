@@ -3,7 +3,7 @@
 Nifty Dialog is a simple javascript library providing support for dialogs within
 HTML applications.
 
-This particular module is designed to tbe included within a Ruby on Rails application.
+This particular module is designed to be included within a Ruby on Rails application.
 To use this, simply add this library to your Gemfile and include some references in
 your appropriate files.
 
