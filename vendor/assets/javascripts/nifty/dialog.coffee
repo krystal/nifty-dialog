@@ -52,6 +52,9 @@ window.Nifty.Dialog =
       insertedDialog.css('width', "#{options.width}px")
       insertedDialog.css('margin-left', "-#{options.width / 2}px")
     
+    if options.offset?
+      insertedDialog.css('margin-top', "#{options.offset}px")
+    
     # Set the closing action for the inserted dialog to close dialog 
     # and fade out the appropriate overlay
     insertedDialog.data 'closeAction', ->
