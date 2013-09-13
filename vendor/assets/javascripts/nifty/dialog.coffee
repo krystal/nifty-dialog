@@ -13,6 +13,14 @@ window.Nifty.Dialog =
   
   # Closes the any overlay which is in place
   closeOverlay: -> this.closeTopDialog()
+  
+  # Complete the opening of a dialog with the given HTML
+  displayDialog: (dialog, content, afterDisplay)->
+    dialog.html(content)
+    dialog.fadeIn('fast')
+    dialog.removeClass 'loading'
+    afterDisplay.call(null, dialog) if afterDisplay?
+    this.onSetContent(null, dialog) if this.onSetContent?
       
   # Open a new dialog which will accept a number of possible options.
   #
@@ -29,6 +37,7 @@ window.Nifty.Dialog =
     # create a template and assign the ID
     dialogTemplate = $("<div class='niftyDialog #{options.class}' id='niftyDialog-#{options.id}'></div>")
     dialogTemplate.data('dialogID', dialogID)
+    
     # insert the dialog into the page
     insertedDialog = dialogTemplate.appendTo($('body'))
     insertedDialog.css('z-index', 2000 + dialogID)
@@ -43,6 +52,17 @@ window.Nifty.Dialog =
       insertedDialog.css('width', "#{options.width}px")
       insertedDialog.css('margin-left', "-#{options.width / 2}px")
     
+    # Set the closing action for the inserted dialog to close dialog 
+    # and fade out the appropriate overlay
+    insertedDialog.data 'closeAction', ->
+      closeMethod = insertedDialog.data('onClose')
+      closeMethod.call(insertedDialog) if closeMethod
+      insertedDialog.fadeOut 'fast', -> insertedDialog.remove()
+      theOverlay.fadeOut 'fast', -> theOverlay.remove()
+
+    # Set that clicking on the dialog's overlay will close the dialog
+    theOverlay.on 'click', -> insertedDialog.data('closeAction').call()
+    
     # load in the content
     if options.url?
       # if loading from a URL, do this
@@ -50,19 +70,11 @@ window.Nifty.Dialog =
       insertedDialog.addClass 'loading'
       $.ajax
         url: options.url
-        success: (data)=>
-          insertedDialog.html(data)
-          insertedDialog.removeClass 'loading'
-          options.afterLoad.call(insertedDialog) if options.afterLoad?
-          insertedDialog.data 'closeAction', ->
-            closeMethod = insertedDialog.data('onClose')
-            closeMethod.call(insertedDialog) if closeMethod
-            insertedDialog.fadeOut 'fast', -> insertedDialog.remove()
-            theOverlay.fadeOut 'fast', -> theOverlay.remove()
-          theOverlay.on 'click', -> insertedDialog.data('closeAction').call()
-          insertedDialog.fadeIn('fast')
-          this.onSetContent(null, insertedDialog) if this.onSetContent?
-
+        success: (data)=> this.displayDialog(insertedDialog, data, options.afterLoad)
+    
+    else if options.html?
+      this.displayDialog(insertedDialog, options.html, options.afterLoad)
+    
     else
       # anything else won't work
       console.log "Dialog could not be displayed. Invalid options passed."
