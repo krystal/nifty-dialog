@@ -1,26 +1,14 @@
 window.Nifty ||= {}
 window.Nifty.Dialog =
   
-  # The zindex to start showing dialogs from
+  # The numerical ID to start showing dialogs from
   startingID: 1
   
   # A callback reference which is run on content set if set.
   onSetContent: null
   
-  closeTopDialog: ->
-    if $('div.niftyDialog').length
-      $('div.niftyDialog:last').data('closeAction').call()
-  
-  # Closes the any overlay which is in place
-  closeOverlay: -> this.closeTopDialog()
-  
-  # Complete the opening of a dialog with the given HTML
-  displayDialog: (dialog, content, afterDisplay)->
-    dialog.html(content)
-    dialog.fadeIn('fast')
-    dialog.removeClass 'loading'
-    afterDisplay.call(null, dialog) if afterDisplay?
-    this.onSetContent(null, dialog) if this.onSetContent?
+  # Stores all behaviors
+  behaviors: {}
       
   # Open a new dialog which will accept a number of possible options.
   #
@@ -40,6 +28,9 @@ window.Nifty.Dialog =
   #   offset     => specifies a vertical offset (in px)
   #
   #   class      => the CSS class to assign to this dialog
+  #
+  #   behavior   => the name of a behavior set to be invoked on dialog open/close.
+  #                 Behaviors can be setup using the Nifty.Dialog.addBehavior method.
   #
   open: (options={})->
 
@@ -70,9 +61,10 @@ window.Nifty.Dialog =
     
     # Set the closing action for the inserted dialog to close dialog 
     # and fade out the appropriate overlay
-    insertedDialog.data 'closeAction', ->
-      closeMethod = insertedDialog.data('onClose')
-      closeMethod.call(insertedDialog) if closeMethod
+    insertedDialog.data 'closeAction', =>
+      options.onClose.call(null, insertedDialog, options) if options.onClose?
+      if options.behavior? && behavior = this.behaviors[options.behavior]
+        behavior.onClose.call(null, insertedDialog, options) if behavior.onClose?
       insertedDialog.fadeOut 'fast', -> insertedDialog.remove()
       theOverlay.fadeOut 'fast', -> theOverlay.remove()
 
@@ -86,18 +78,36 @@ window.Nifty.Dialog =
       insertedDialog.addClass 'loading'
       $.ajax
         url: options.url
-        success: (data)=> this.displayDialog(insertedDialog, data, options.afterLoad)
+        success: (data)=> this.displayDialog(insertedDialog, data, options)
     
     else if options.html?
-      this.displayDialog(insertedDialog, options.html, options.afterLoad)
+      this.displayDialog(insertedDialog, options.html, options)
     
     else
       # anything else won't work
       console.log "Dialog could not be displayed. Invalid options passed."
       console.log options
       return false
+  
+  # Add a behaviour callback which will be executed
+  addBehavior: (options)->
+    if options.name?
+      this.behaviors[options.name] = options
+      true
+    else
+      console.log "Must pass a 'name' option to the addBehavior method."
+      false
     
-    
+  # Complete the opening of a dialog with the given HTML
+  displayDialog: (dialog, content, options={})->
+    dialog.html(content)
+    dialog.fadeIn('fast')
+    dialog.removeClass 'loading'
+    if options.behavior? && behavior = this.behaviors[options.behavior]
+      behavior.onLoad.call(null, dialog, options) if behavior.onLoad?
+    options.afterLoad.call(null, dialog) if options.afterLoad?
+    this.onSetContent(null, dialog) if this.onSetContent?
+
   # This method will replace the contents of the nearest dialog (or the one with the
   # given ID if one is given).
   setContent: (content, id = null)->
@@ -116,3 +126,9 @@ window.Nifty.Dialog =
         overlay.remove()
     overlay.fadeIn('fast')
     
+  # Closes the top dialgo in the dialog stack
+  closeTopDialog: ->
+    if $('div.niftyDialog').length
+      $('div.niftyDialog:last').data('closeAction').call()
+    
+  
