@@ -24,9 +24,22 @@ window.Nifty.Dialog =
       
   # Open a new dialog which will accept a number of possible options.
   #
+  #   id         => the ID to assign to this dialog (prefixed with 'niftyDialog-' )
+  #
   #   url        => open a dialog containing the HTML at the given URL. When
   #                 displaying using a URL, the dialog will open immediately
   #                 and containing a spinner until the data is loaded.
+  #
+  #   html       => a string of HTML which contains the HTML which should be
+  #                 displayed in the dialog.
+  #
+  #   afterLoad  => a callback to execute after the dialog has been loaded.
+  #
+  #   width      => the width of the dialog (in px, defaults to CSS-provided)
+  #
+  #   offset     => specifies a vertical offset (in px)
+  #
+  #   class      => the CSS class to assign to this dialog
   #
   open: (options={})->
 
