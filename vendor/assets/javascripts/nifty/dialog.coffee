@@ -33,7 +33,6 @@ window.Nifty.Dialog =
   #                 Behaviors can be setup using the Nifty.Dialog.addBehavior method.
   #
   open: (options={})->
-
     # set a dialog ID for this dialog
     dialogsOpen = $('div.niftyDialog').length
     dialogID = if dialogsOpen == 0 then this.startingID else (dialogsOpen * 10) + this.startingID
@@ -46,12 +45,15 @@ window.Nifty.Dialog =
     insertedDialog = dialogTemplate.appendTo($('body'))
     insertedDialog.css('z-index', 2000 + dialogID)
     
+    # set the content on the dialog
+    insertedDialog.data('options', options)
+    
     overlayClass = ''
     overlayClass = 'invisible' if dialogID > 1
     theOverlay = $("<div class='niftyOverlay #{overlayClass}'></div>").insertBefore(insertedDialog).css('z-index', 2000 + dialogID - 1)
     theOverlay.fadeIn('fast')
     
-      # if we have a width, set the width for the dialog
+    # if we have a width, set the width for the dialog
     if options.width?
       insertedDialog.css('width', "#{options.width}px")
       insertedDialog.css('margin-left', "-#{options.width / 2}px")
@@ -78,10 +80,10 @@ window.Nifty.Dialog =
       insertedDialog.addClass 'loading'
       $.ajax
         url: options.url
-        success: (data)=> this.displayDialog(insertedDialog, data, options)
+        success: (data)=> this.displayDialog(insertedDialog, data)
     
     else if options.html?
-      this.displayDialog(insertedDialog, options.html, options)
+      this.displayDialog(insertedDialog, options.html)
     
     else
       # anything else won't work
@@ -99,10 +101,11 @@ window.Nifty.Dialog =
       false
     
   # Complete the opening of a dialog with the given HTML
-  displayDialog: (dialog, content, options={})->
+  displayDialog: (dialog, content)->
     dialog.html(content)
     dialog.fadeIn('fast')
     dialog.removeClass 'loading'
+    options = dialog.data('options')
     if options.behavior? && behavior = this.behaviors[options.behavior]
       behavior.onLoad.call(null, dialog, options) if behavior.onLoad?
     options.afterLoad.call(null, dialog) if options.afterLoad?
@@ -112,8 +115,12 @@ window.Nifty.Dialog =
   # given ID if one is given).
   setContent: (content, id = null)->
     dialog = if id == null then $('div.niftyDialog:last') else $("div.niftyDialog#dialog-#{id}")
-    dialog.html(content)
-    this.onSetContent(null, dialog) if this.onSetContent?
+    if dialog.length
+      dialog.html(content)
+      options = dialog.data('options')
+      if options.behavior? && behavior = this.behaviors[options.behavior]
+        behavior.onSetContent.call(null, dialog, options) if behavior.onSetContent?
+      this.onSetContent(null, dialog) if this.onSetContent?
   
   # Create a new overlay
   createOverlay: (options)->
