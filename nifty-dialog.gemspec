@@ -6,7 +6,7 @@ Gem::Specification.new do |s|
   s.summary       = s.description
   s.homepage      = "https://github.com/niftyware/dialog"
   s.version       = Nifty::Dialog::VERSION
-  s.files         = Dir.glob("{lib}/**/*")
+  s.files         = Dir.glob("{lib,vendor}/**/*")
   s.require_paths = ["lib"]
   s.authors       = ["Adam Cooke"]
   s.email         = ["adam@niftyware.io"]
