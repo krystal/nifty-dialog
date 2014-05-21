@@ -27,6 +27,8 @@ window.Nifty.Dialog =
   #
   #   offset     => specifies a vertical offset (in px)
   #
+  #   stack      => adds an offset if this is not the first open dialog
+  #
   #   class      => the CSS class to assign to this dialog
   #
   #   behavior   => the name of a behavior set to be invoked on dialog open/close.
@@ -60,7 +62,15 @@ window.Nifty.Dialog =
     
     if options.offset?
       insertedDialog.css('margin-top', "#{options.offset}px")
-    
+
+    if options.stack?
+      x = parseInt(insertedDialog.css('margin-left'), 10) + (dialogsOpen * 20)
+      y = parseInt(insertedDialog.css('margin-top'), 10) + (dialogsOpen * 30)
+      insertedDialog.css
+        'margin-left': "#{x}px"
+        'margin-top': "#{y}px"
+      
+
     # Set the closing action for the inserted dialog to close dialog 
     # and fade out the appropriate overlay
     insertedDialog.data 'closeAction', =>
