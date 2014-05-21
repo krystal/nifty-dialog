@@ -139,6 +139,8 @@ window.Nifty.Dialog =
         behavior.onSetContent.call(null, dialog, options) if behavior.onSetContent?
       this.onSetContent(null, dialog) if this.onSetContent?
 
+  # This method will refectch the contents of the nearest dialog (or the one with the
+  # given ID if one is given).
   reloadContent: (id = null)->
     dialog = if id == null then $('div.niftyDialog:last') else $("div.niftyDialog#dialog-#{id}")
     options = dialog.data('options')
