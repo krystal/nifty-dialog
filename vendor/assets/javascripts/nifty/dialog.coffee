@@ -101,6 +101,13 @@ window.Nifty.Dialog =
       console.log options
       return false
   
+  ajaxLoad: (url, insertedDialog)->
+    insertedDialog.addClass 'ajax'
+    insertedDialog.addClass 'loading'
+    $.ajax
+      url: options.url
+      success: (data)=> this.displayDialog(insertedDialog, data)
+
   # Add a behaviour callback which will be executed
   addBehavior: (options)->
     if options.name?
@@ -131,6 +138,14 @@ window.Nifty.Dialog =
       if options.behavior? && behavior = this.behaviors[options.behavior]
         behavior.onSetContent.call(null, dialog, options) if behavior.onSetContent?
       this.onSetContent(null, dialog) if this.onSetContent?
+
+  reloadContent: (id = null)->
+    dialog = if id == null then $('div.niftyDialog:last') else $("div.niftyDialog#dialog-#{id}")
+    options = dialog.data('options')
+    if options.url?
+      $.ajax
+        url: options.url
+        success: (data)=> this.setContent(data, id)
   
   # Create a new overlay
   createOverlay: (options)->
