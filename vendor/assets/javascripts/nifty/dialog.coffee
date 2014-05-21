@@ -39,6 +39,8 @@ window.Nifty.Dialog =
     dialogsOpen = $('div.niftyDialog').length
     dialogID = if dialogsOpen == 0 then this.startingID else (dialogsOpen * 10) + this.startingID
     
+    options.id = dialogID unless options.id?
+
     # create a template and assign the ID
     dialogTemplate = $("<div class='niftyDialog #{options.class}' id='niftyDialog-#{options.id}'></div>")
     dialogTemplate.data('dialogID', dialogID)
@@ -131,7 +133,7 @@ window.Nifty.Dialog =
   # This method will replace the contents of the nearest dialog (or the one with the
   # given ID if one is given).
   setContent: (content, id = null)->
-    dialog = if id == null then $('div.niftyDialog:last') else $("div.niftyDialog#dialog-#{id}")
+    dialog = if id == null then $('div.niftyDialog:last') else $("div.niftyDialog#niftyDialog-#{id}")
     if dialog.length
       dialog.html(content)
       options = dialog.data('options')
@@ -142,7 +144,7 @@ window.Nifty.Dialog =
   # This method will refectch the contents of the nearest dialog (or the one with the
   # given ID if one is given).
   reloadContent: (id = null)->
-    dialog = if id == null then $('div.niftyDialog:last') else $("div.niftyDialog#dialog-#{id}")
+    dialog = if id == null then $('div.niftyDialog:last') else $("div.niftyDialog#niftyDialog-#{id}")
     options = dialog.data('options')
     if options.url?
       $.ajax
