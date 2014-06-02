@@ -33,6 +33,7 @@ window.Nifty.Dialog =
   #
   #   behavior   => the name of a behavior set to be invoked on dialog open/close.
   #                 Behaviors can be setup using the Nifty.Dialog.addBehavior method.
+  #                 Valid behaviors: beforeLoad, onLoad, onSetContent, onClose
   #
   open: (options={})->
     # set a dialog ID for this dialog
@@ -90,6 +91,9 @@ window.Nifty.Dialog =
       # if loading from a URL, do this
       insertedDialog.addClass 'ajax'
       insertedDialog.addClass 'loading'
+      if options.behavior? && behavior = this.behaviors[options.behavior]
+        behavior.beforeLoad.call(null, insertedDialog, options) if behavior.beforeLoad?
+      
       $.ajax
         url: options.url
         success: (data)=> this.displayDialog(insertedDialog, data)
@@ -102,13 +106,6 @@ window.Nifty.Dialog =
       console.log "Dialog could not be displayed. Invalid options passed."
       console.log options
       return false
-  
-  ajaxLoad: (url, insertedDialog)->
-    insertedDialog.addClass 'ajax'
-    insertedDialog.addClass 'loading'
-    $.ajax
-      url: options.url
-      success: (data)=> this.displayDialog(insertedDialog, data)
 
   # Add a behaviour callback which will be executed
   addBehavior: (options)->
@@ -147,6 +144,8 @@ window.Nifty.Dialog =
     dialog = if id == null then $('div.niftyDialog:last') else $("div.niftyDialog#niftyDialog-#{id}")
     options = dialog.data('options')
     if options.url?
+      if options.behavior? && behavior = this.behaviors[options.behavior]
+        behavior.beforeLoad.call(null, insertedDialog, options) if behavior.beforeLoad?
       $.ajax
         url: options.url
         success: (data)=> this.setContent(data, id)
