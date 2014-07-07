@@ -145,7 +145,7 @@ window.Nifty.Dialog =
     options = dialog.data('options')
     if options.url?
       if options.behavior? && behavior = this.behaviors[options.behavior]
-        behavior.beforeLoad.call(null, insertedDialog, options) if behavior.beforeLoad?
+        behavior.beforeLoad.call(null, dialog, options) if behavior.beforeLoad?
       $.ajax
         url: options.url
         success: (data)=> this.setContent(data, id)
