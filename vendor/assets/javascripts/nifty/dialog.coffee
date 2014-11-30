@@ -43,7 +43,7 @@ window.Nifty.Dialog =
     options.id = dialogID unless options.id?
 
     # create a template and assign the ID
-    dialogTemplate = $("<div class='niftyDialog #{options.class}' id='niftyDialog-#{options.id}'></div>")
+    dialogTemplate = $("<div class='niftyDialog #{options.class || ''}' id='niftyDialog-#{options.id}'></div>")
     dialogTemplate.data('dialogID', dialogID)
 
     # insert the dialog into the page
