@@ -124,6 +124,7 @@ window.Nifty.Dialog =
     options = dialog.data('options')
     if options.behavior? && behavior = this.behaviors[options.behavior]
       behavior.onLoad.call(null, dialog, options) if behavior.onLoad?
+      behavior.onSetContent.call(null, dialog, options) if behavior.onSetContent?
     options.afterLoad.call(null, dialog) if options.afterLoad?
     this.onSetContent(null, dialog) if this.onSetContent?
 
