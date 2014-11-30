@@ -1,15 +1,15 @@
 window.Nifty ||= {}
 window.Nifty.Dialog =
-  
+
   # The numerical ID to start showing dialogs from
   startingID: 1
-  
+
   # A callback reference which is run on content set if set.
   onSetContent: null
-  
+
   # Stores all behaviors
   behaviors: {}
-      
+
   # Open a new dialog which will accept a number of possible options.
   #
   #   id         => the ID to assign to this dialog (prefixed with 'niftyDialog-' )
@@ -39,30 +39,30 @@ window.Nifty.Dialog =
     # set a dialog ID for this dialog
     dialogsOpen = $('div.niftyDialog').length
     dialogID = if dialogsOpen == 0 then this.startingID else (dialogsOpen * 10) + this.startingID
-    
+
     options.id = dialogID unless options.id?
 
     # create a template and assign the ID
     dialogTemplate = $("<div class='niftyDialog #{options.class}' id='niftyDialog-#{options.id}'></div>")
     dialogTemplate.data('dialogID', dialogID)
-    
+
     # insert the dialog into the page
     insertedDialog = dialogTemplate.appendTo($('body'))
     insertedDialog.css('z-index', 2000 + dialogID)
-    
+
     # set the content on the dialog
     insertedDialog.data('options', options)
-    
+
     overlayClass = ''
     overlayClass = 'invisible' if dialogID > 1
     theOverlay = $("<div class='niftyOverlay #{overlayClass}'></div>").insertBefore(insertedDialog).css('z-index', 2000 + dialogID - 1)
     theOverlay.fadeIn('fast')
-    
+
     # if we have a width, set the width for the dialog
     if options.width?
       insertedDialog.css('width', "#{options.width}px")
       insertedDialog.css('margin-left', "-#{options.width / 2}px")
-    
+
     if options.offset?
       insertedDialog.css('margin-top', "#{options.offset}px")
 
@@ -72,9 +72,9 @@ window.Nifty.Dialog =
       insertedDialog.css
         'margin-left': "#{x}px"
         'margin-top': "#{y}px"
-      
 
-    # Set the closing action for the inserted dialog to close dialog 
+
+    # Set the closing action for the inserted dialog to close dialog
     # and fade out the appropriate overlay
     insertedDialog.data 'closeAction', =>
       options.onClose.call(null, insertedDialog, options) if options.onClose?
@@ -85,7 +85,7 @@ window.Nifty.Dialog =
 
     # Set that clicking on the dialog's overlay will close the dialog
     theOverlay.on 'click', -> insertedDialog.data('closeAction').call()
-    
+
     # load in the content
     if options.url?
       # if loading from a URL, do this
@@ -93,14 +93,14 @@ window.Nifty.Dialog =
       insertedDialog.addClass 'loading'
       if options.behavior? && behavior = this.behaviors[options.behavior]
         behavior.beforeLoad.call(null, insertedDialog, options) if behavior.beforeLoad?
-      
+
       $.ajax
         url: options.url
         success: (data)=> this.displayDialog(insertedDialog, data)
-    
+
     else if options.html?
       this.displayDialog(insertedDialog, options.html)
-    
+
     else
       # anything else won't work
       console.log "Dialog could not be displayed. Invalid options passed."
@@ -115,7 +115,7 @@ window.Nifty.Dialog =
     else
       console.log "Must pass a 'name' option to the addBehavior method."
       false
-    
+
   # Complete the opening of a dialog with the given HTML
   displayDialog: (dialog, content)->
     dialog.html(content)
@@ -149,7 +149,7 @@ window.Nifty.Dialog =
       $.ajax
         url: options.url
         success: (data)=> this.setContent(data, id)
-  
+
   # Create a new overlay
   createOverlay: (options)->
     overlay = $("<div class='niftyOverlay invisible'></div>")
@@ -160,10 +160,10 @@ window.Nifty.Dialog =
       overlay.fadeOut 'fast', ->
         overlay.remove()
     overlay.fadeIn('fast')
-    
+
   # Closes the top dialgo in the dialog stack
   closeTopDialog: ->
     if $('div.niftyDialog').length
       $('div.niftyDialog:last').data('closeAction').call()
-    
-  
+
+
