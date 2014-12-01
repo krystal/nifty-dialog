@@ -42,20 +42,24 @@ window.Nifty.Dialog =
 
     options.id = dialogID unless options.id?
 
+    # Add the overlay
+    overlayClass = ''
+    overlayClass = 'invisible' if dialogID > 1
+    theOverlay = $("<div class='niftyOverlay #{overlayClass}'></div>").appendTo($('body')).css('z-index', 2000 + dialogID - 1)
+
     # create a template and assign the ID
     dialogTemplate = $("<div class='niftyDialog #{options.class || ''}' id='niftyDialog-#{options.id}'></div>")
     dialogTemplate.data('dialogID', dialogID)
 
     # insert the dialog into the page
-    insertedDialog = dialogTemplate.appendTo($('body'))
+    insertedDialog = dialogTemplate.appendTo(theOverlay)
     insertedDialog.css('z-index', 2000 + dialogID)
 
     # set the content on the dialog
     insertedDialog.data('options', options)
 
-    overlayClass = ''
-    overlayClass = 'invisible' if dialogID > 1
-    theOverlay = $("<div class='niftyOverlay #{overlayClass}'></div>").insertBefore(insertedDialog).css('z-index', 2000 + dialogID - 1)
+    # fade the overlay
+    $('body').addClass('niftyDialog-open')
     theOverlay.fadeIn('fast')
 
     # if we have a width, set the width for the dialog
@@ -81,10 +85,16 @@ window.Nifty.Dialog =
       if options.behavior? && behavior = this.behaviors[options.behavior]
         behavior.onClose.call(null, insertedDialog, options) if behavior.onClose?
       insertedDialog.fadeOut 'fast', -> insertedDialog.remove()
-      theOverlay.fadeOut 'fast', -> theOverlay.remove()
+      theOverlay.fadeOut 'fast', ->
+        theOverlay.remove()
+        if $('.niftyOverlay').length == 0
+          $('body').removeClass('niftyDialog-open')
+
 
     # Set that clicking on the dialog's overlay will close the dialog
-    theOverlay.on 'click', -> insertedDialog.data('closeAction').call()
+    theOverlay.on 'click', (e)->
+      if $(e.target).is('.niftyOverlay')
+        insertedDialog.data('closeAction').call()
 
     # load in the content
     if options.url?
