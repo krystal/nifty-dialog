@@ -65,7 +65,7 @@ window.Nifty.Dialog =
     # if we have a width, set the width for the dialog
     if options.width?
       insertedDialog.css('width', "#{options.width}px")
-      insertedDialog.css('margin-left', "-#{options.width / 2}px")
+      insertedDialog.css('margin-left', "#{options.width / 2}px")
 
     if options.offset?
       insertedDialog.css('margin-top', "#{options.offset}px")
