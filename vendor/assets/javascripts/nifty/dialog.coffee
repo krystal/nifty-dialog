@@ -65,17 +65,21 @@ window.Nifty.Dialog =
     # if we have a width, set the width for the dialog
     if options.width?
       insertedDialog.css('width', "#{options.width}px")
-      insertedDialog.css('margin-left', "-#{options.width / 2}px")
 
     if options.offset?
-      insertedDialog.css('margin-top', "#{options.offset}px")
+      insertedDialog.css('top', "#{options.offset}px")
+      insertedDialog.css('left', "#{options.offset}px")
 
     if options.stack?
-      x = parseInt(insertedDialog.css('margin-left'), 10) + (dialogsOpen * 20)
-      y = parseInt(insertedDialog.css('margin-top'), 10) + (dialogsOpen * 30)
+      currentLeft = insertedDialog.css('left')
+      currentTop = insertedDialog.css('left')
+      currentLeft = 0 if currentLeft == 'auto'
+      currentTop = 0  if currentTop == 'auto'
+      x = parseInt(currentLeft, 10) + (dialogsOpen * 20)
+      y = parseInt(currentTop, 10) + (dialogsOpen * 30)
       insertedDialog.css
-        'margin-left': "#{x}px"
-        'margin-top': "#{y}px"
+        'left': "#{x}px"
+        'top': "#{y}px"
 
 
     # Set the closing action for the inserted dialog to close dialog
